@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model users {
+    userId    String      @id @db.VarChar(255)
+    userName  String      @db.VarChar(255)
+    id_loc    String?     @db.VarChar(255)
+    createdAt DateTime?   @default(now()) @db.Timestamp(0)
+    login     login[]
+    user_book user_book[]
+}
+
+model login {
+    userId    String    @id @db.VarChar(255)
+    email     String    @db.VarChar(255)
+    password  String    @db.VarChar(255)
+    createdAt DateTime? @default(now()) @db.Timestamp(0)
+    users     users     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction, map: "users_login_ibfk_1")
+}
+
+model books {
+    bookId    String      @id @db.VarChar(255)
+    title     String      @db.VarChar(255)
+    author    String      @db.VarChar(255)
+    cover_loc String?     @db.VarChar(255)
+    createdAt DateTime?   @default(now()) @db.Timestamp(0)
+    status    String      @db.VarChar(255)
+    user_book user_book[]
+}
+
+model user_book {
+    userId      String    @db.VarChar(255)
+    bookId      String    @db.VarChar(255)
+    allocatedOn DateTime  @default(now()) @db.Timestamp(0)
+    returnedOn  DateTime? @db.Timestamp(0)
+
+    users users @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction, map: "user_book_ibfk_1")
+    books books @relation(fields: [bookId], references: [bookId], onDelete: Cascade, onUpdate: NoAction, map: "user_book_ibfk_2")
+
+    @@id([userId, bookId, allocatedOn])
+}
