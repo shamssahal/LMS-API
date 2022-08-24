@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +23,7 @@
     "helmet": "^5.1.1",
     "js-sha256": "^0.9.0",
     "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "mysql2": "^2.3.3",
     "prisma": "^4.2.1",
