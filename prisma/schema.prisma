@@ -11,12 +11,15 @@ datasource db {
 }
 
 model users {
-    userId    String      @id @db.VarChar(255)
-    userName  String      @db.VarChar(255)
-    id_loc    String?     @db.VarChar(255)
-    createdAt DateTime?   @default(now()) @db.Timestamp(0)
-    login     login[]
-    user_book user_book[]
+    userId           String      @id @db.VarChar(255)
+    userName         String      @db.VarChar(255)
+    id_loc           String?     @db.VarChar(255)
+    createdAt        DateTime?   @default(now()) @db.Timestamp(0)
+    default_credit   Int         @default(5) @db.Int
+    available_credit Int         @default(5) @db.Int
+    account_status   String      @default("active") @db.VarChar(255)
+    login            login[]
+    user_book        user_book[]
 }
 
 model login {
@@ -28,13 +31,14 @@ model login {
 }
 
 model books {
-    bookId    String      @id @db.VarChar(255)
-    title     String      @db.VarChar(255)
-    author    String      @db.VarChar(255)
-    cover_loc String?     @db.VarChar(255)
-    createdAt DateTime?   @default(now()) @db.Timestamp(0)
-    status    String      @db.VarChar(255)
-    user_book user_book[]
+    bookId      String      @id @db.VarChar(255)
+    title       String      @db.VarChar(255)
+    author      String      @db.VarChar(255)
+    cover_loc   String?     @db.VarChar(255)
+    createdAt   DateTime?   @default(now()) @db.Timestamp(0)
+    status      String      @db.VarChar(255)
+    book_status String      @default("available") @db.VarChar(255)
+    user_book   user_book[]
 }
 
 model user_book {

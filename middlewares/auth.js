@@ -3,16 +3,19 @@ const _ = require('lodash');
 const { returnObject } = require('../utils/returnObject');
 
 const checkJWTAuthToken = (req, res, next) => {
-    const jwtToken = req.headers.authorization || '';
-
-    if (jwtToken === '') {
+    if (!req.cookies.access_token) {
+        throw new Error('Authentication Failure');
+    }
+    const { jwToken } = req.cookies.access_token;
+    if (!jwToken) {
         res.status(401).json(returnObject(401, 'Invalid auth token', {}));
     } else {
         jwt.verify(
-            _.split(jwtToken, ' ')[1],
+            jwToken,
             'LMS_TokenSecret#@!',
             (err, decodedToken) => {
                 if (err) {
+                    console.log(err);
                     if (err.name === 'JsonWebTokenError') {
                         res.status(401).json(returnObject(401, 'Invalid auth token', {}));
                     } else if (err.name === 'TokenExpiredError') {

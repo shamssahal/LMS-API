@@ -2,6 +2,7 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const helmet = require('helmet');
 const responseTime = require('response-time');
@@ -18,6 +19,11 @@ const limiter = rateLimit({
 
 // initating express app
 const app = express();
+
+// importing routes
+const login = require('./routes/Login');
+const books = require('./routes/Books');
+const users = require('./routes/Users');
 
 // handlng CORS issues
 app.use((req, res, next) => {
@@ -68,11 +74,17 @@ app.use(
 app.use(helmet());
 app.enable('trust proxy');
 app.use(limiter);
+app.use(cookieParser());
 app.use(bodyParser());
 app.use(compression());
 
 // applying auth layer
 app.use(auth);
+
+// using routes
+app.use('/', login);
+app.use('/', books);
+app.use('/', users);
 
 // error handling in case server goes down
 app.use((err, req, res, next) => {
