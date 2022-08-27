@@ -1,4 +1,7 @@
 const express = require('express');
+const { v4: uuidv4 } = require('uuid');
+const AWS = require('aws-sdk');
+
 const { deallocateBook } = require('../../utils/deallocateBook');
 const { returnObject } = require('../../utils/returnObject');
 const {
@@ -9,6 +12,13 @@ const {
     allocateBook,
     deleteBook,
 } = require('./helperMethods');
+
+const { accessKeyId, secretAccessKey } = require('../../configs/awsConfig');
+
+const s3 = new AWS.S3({
+    accessKeyId,
+    secretAccessKey,
+});
 
 const router = express.Router();
 
@@ -108,6 +118,26 @@ router.delete('/book', async (req, res) => {
         return res.status(200).json(returnObject(200, 'Book Deleted', {}));
     } catch (err) {
         return res.status(400).json(returnObject(400, err.message || 'Could not delete book', {}));
+    }
+});
+
+router.get('/preSignedUrl', async (req, res) => {
+    const fileType = req.query.queryVal || '';
+    if (fileType === '') {
+        return res.status(400).json(returnObject(400, 'Missing Parameters', {}));
+    }
+    try {
+        const key = `misc/${uuidv4()}.${fileType}`;
+        const url = s3.getSignedUrl('putObject', {
+            Bucket: 'image-store-admin',
+            ContentType: fileType,
+            Key: key,
+        });
+        return res
+            .status(200)
+            .json(returnObject(200, 'Presigned Upload Url', { key, url }));
+    } catch (err) {
+        return res.status(400).json(returnObject(400, err.message || 'Could not get preSignedUrl', {}));
     }
 });
 
