@@ -1,36 +1,16 @@
 const { executeQuery } = require('../../models/controller');
-const { deallocateBook } = require('../Books/helperMethods');
-
-const updateUserCredit = async (userId, action) => {
-    const increaseCreditQuery = `
-        UPDATE users
-            SET available_credit=available_credit+1
-        WHERE userId=?
-    `;
-    const decreaseCreditQuery = `
-        UPDATE users
-            SET available_credit=available_credit-1
-        WHERE userId=?
-    `;
-    try {
-        if (action === 'increase') {
-            await executeQuery(increaseCreditQuery, [userId]);
-        } else {
-            await executeQuery(decreaseCreditQuery, [userId]);
-        }
-    } catch (err) {
-        throw Error(err.message || 'Could not update user credit');
-    }
-};
+const { deallocateBook } = require('../../utils/deallocateBook');
 
 const getUserAllocationDetails = async (userId) => {
     const getUserBookDetailsQuery = `
         SELECT 
             user_book.*,
-            books.book_status
+            books.book_status,
+            books.title
         FROM user_book
         JOIN books ON user_book.bookId = books.bookId
         WHERE userId=?
+        ORDER BY user_book.allocatedOn DESC
     `;
     try {
         const userBookDetails = await executeQuery(getUserBookDetailsQuery, [userId]);
@@ -110,14 +90,14 @@ const deleteUser = async (userId) => {
         WHERE userId=?
     `;
     try {
-        const userData = await getUserDetails(userId);
-        const userDetails = userData[0];
+        const userDetails = await getUserDetails(userId);
+        console.log(userDetails);
         if (userDetails.available_credit < userDetails.default_credit) {
-            userDetails.allocationHistory.forEach(async ({ bookId, returnedOn }) => {
+            Promise.all(userDetails.allocationHistory.map(async ({ bookId, returnedOn }) => {
                 if (returnedOn === null) {
                     await deallocateBook(bookId, userId);
                 }
-            });
+            }));
         }
         await executeQuery(deleteUserQuery, [userId]);
         return;
@@ -131,5 +111,4 @@ module.exports = {
     getUserDetails,
     updateUserDetails,
     deleteUser,
-    updateUserCredit,
 };

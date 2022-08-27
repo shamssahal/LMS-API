@@ -4,7 +4,7 @@ const { returnObject } = require('../utils/returnObject');
 
 const checkJWTAuthToken = (req, res, next) => {
     if (!req.cookies.access_token) {
-        throw new Error('Authentication Failure');
+        return res.status(401).json(returnObject(401, 'Invalid auth token', {}));
     }
     const { jwToken } = req.cookies.access_token;
     if (!jwToken) {

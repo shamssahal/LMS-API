@@ -7,6 +7,7 @@ const compression = require('compression');
 const helmet = require('helmet');
 const responseTime = require('response-time');
 const rateLimit = require('express-rate-limit');
+const cors = require('cors');
 
 const logger = require('./utils/Logger');
 const auth = require('./middlewares/auth');
@@ -19,6 +20,7 @@ const limiter = rateLimit({
 
 // initating express app
 const app = express();
+// app.use(cors());
 
 // importing routes
 const login = require('./routes/Login');
@@ -27,12 +29,7 @@ const users = require('./routes/Users');
 
 // handlng CORS issues
 app.use((req, res, next) => {
-    let allowedOrigins = [];
-    if (process.env.NODE_ENV === 'production') {
-        allowedOrigins = allowedOrigins.concat('http://localhost:3001');
-    } else {
-        allowedOrigins = allowedOrigins.concat('http://localhost:3001');
-    }
+    const allowedOrigins = ['http://localhost:3001'];
 
     const { origin } = req.headers;
     if (allowedOrigins.indexOf(origin) > -1) {
@@ -41,6 +38,8 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.header('Access-Control-Allow-Credentials', true);
+
+    if (req.method === 'OPTIONS') return res.sendStatus(200);
 
     return next();
 });

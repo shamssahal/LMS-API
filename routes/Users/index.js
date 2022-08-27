@@ -16,7 +16,7 @@ router.get('/users', async (req, res) => {
 });
 
 router.get('/user', async (req, res) => {
-    const userId = req.query.userId || '';
+    const userId = JSON.parse(req.query.queryVal).userId || '';
     if (userId === '') {
         return res.status(400).json(returnObject(400, 'Missing Parameters', {}));
     }
@@ -45,7 +45,7 @@ router.put('/user', async (req, res) => {
     }
 });
 
-router.put('/deleteUser', async (req, res) => {
+router.delete('/user', async (req, res) => {
     const userId = req.body.userId || '';
     if (userId === '') {
         return res.status(400).json(returnObject(400, 'Missing Parameters', {}));

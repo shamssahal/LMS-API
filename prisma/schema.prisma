@@ -36,7 +36,7 @@ model books {
     author      String      @db.VarChar(255)
     cover_loc   String?     @db.VarChar(255)
     createdAt   DateTime?   @default(now()) @db.Timestamp(0)
-    status      String      @db.VarChar(255)
+    status      String      @default("Unallocated") @db.VarChar(255)
     book_status String      @default("available") @db.VarChar(255)
     user_book   user_book[]
 }

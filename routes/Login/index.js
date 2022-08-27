@@ -57,4 +57,35 @@ router.post('/signup', async (req, res) => {
         return res.status(400).json(returnObject(400, err.message || 'Could not signup', {}));
     }
 });
+
+router.get('/logout', async (req, res) => {
+    try {
+        if (process.env.NODE_ENV === 'production') {
+            res.cookie(
+                'access_token',
+                {},
+                {
+                    maxAge: 0,
+                    httpOnly: false,
+                    secure: true,
+                },
+            );
+        } else {
+            res.cookie(
+                'access_token',
+                {},
+                {
+                    maxAge: 0,
+                    httpOnly: true,
+                },
+            );
+        }
+        return res.status(200).json(returnObject(200, 'Logged Out Successfully', {}));
+    } catch (err) {
+        return res.status(401).json(returnObject(401, err.message, {}));
+    }
+});
+
+router.get('/loginCheck', async (req, res) => res.status(200).json(returnObject(200, 'Is Logged In', {})));
+
 module.exports = router;
