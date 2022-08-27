@@ -13,7 +13,7 @@ const {
     deleteBook,
 } = require('./helperMethods');
 
-const { accessKeyId, secretAccessKey } = require('../../configs/awsConfig');
+const { accessKeyId, secretAccessKey, bucketName } = require('../../configs/awsConfig');
 
 const s3 = new AWS.S3({
     accessKeyId,
@@ -129,7 +129,7 @@ router.get('/preSignedUrl', async (req, res) => {
     try {
         const key = `misc/${uuidv4()}.${fileType}`;
         const url = s3.getSignedUrl('putObject', {
-            Bucket: 'image-store-admin',
+            Bucket: bucketName,
             ContentType: fileType,
             Key: key,
         });
