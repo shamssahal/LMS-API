@@ -29,7 +29,10 @@ const users = require('./routes/Users');
 
 // handlng CORS issues
 app.use((req, res, next) => {
-    const allowedOrigins = ['http://localhost:3001'];
+    const allowedOrigins = [
+        'http://localhost:3001',
+        'https://lms-app-chi.vercel.app',
+    ];
 
     const { origin } = req.headers;
     if (allowedOrigins.indexOf(origin) > -1) {
