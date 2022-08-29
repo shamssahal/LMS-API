@@ -20,42 +20,24 @@ const limiter = rateLimit({
 
 // initating express app
 const app = express();
-// app.use(cors());
 
 // importing routes
 const login = require('./routes/Login');
 const books = require('./routes/Books');
 const users = require('./routes/Users');
 
-// handlng CORS issues
-app.use((req, res, next) => {
-    let allowedOrigins = [
-        'http://localhost:3001',
-        'https://lms-app-chi.vercel.app',
-        'https://lms.sahal.dev/',
-    ];
+const whitelist = ['http://localhost:3000', 'https://lms.sahal.dev'];
+const corsOptions = {
+    credentials: true, // This is important.
+    origin: (origin, callback) => {
+        if (whitelist.includes(origin)) { return callback(null, true); }
 
-    if (process.env.NODE_ENV === 'production') {
-        allowedOrigins = allowedOrigins.concat('https://lms-app-chi.vercel.app');
-        allowedOrigins = allowedOrigins.concat('https://lms.sahal.dev/');
-    } else {
-        allowedOrigins = allowedOrigins.concat('http://localhost:3001');
-    }
+        callback(new Error('Not allowed by CORS'));
+    },
+};
 
-    const { origin } = req.headers;
-    if (allowedOrigins.indexOf(origin) > -1) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    res.header(
-        'Access-Control-Allow-Methods',
-        'GET, POST, PUT, DELETE, OPTIONS',
-    );
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization,sentry-trace');
-    res.header('Access-Control-Allow-Credentials', true);
-    if (req.method === 'OPTIONS') return res.sendStatus(200);
+app.use(cors(corsOptions));
 
-    return next();
-});
 // Logging incoming request on console on development and sourcing out on production
 app.use(
     responseTime((req, res, time) => {
