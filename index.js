@@ -7,7 +7,6 @@ const compression = require('compression');
 const helmet = require('helmet');
 const responseTime = require('response-time');
 const rateLimit = require('express-rate-limit');
-const cors = require('cors');
 
 const logger = require('./utils/Logger');
 const auth = require('./middlewares/auth');
@@ -20,24 +19,42 @@ const limiter = rateLimit({
 
 // initating express app
 const app = express();
+// app.use(cors());
 
 // importing routes
 const login = require('./routes/Login');
 const books = require('./routes/Books');
 const users = require('./routes/Users');
 
-const whitelist = ['http://localhost:3000', 'https://lms.sahal.dev'];
-const corsOptions = {
-    credentials: true, // This is important.
-    origin: (origin, callback) => {
-        if (whitelist.includes(origin)) { return callback(null, true); }
+// handlng CORS issues
+app.use((req, res, next) => {
+    let allowedOrigins = [
+        'http://localhost:3001',
+        'https://lms-app-chi.vercel.app',
+        'https://lms.sahal.dev/',
+    ];
 
-        callback(new Error('Not allowed by CORS'));
-    },
-};
+    if (process.env.NODE_ENV === 'production') {
+        allowedOrigins = allowedOrigins.concat('https://lms-app-chi.vercel.app');
+        allowedOrigins = allowedOrigins.concat('https://lms.sahal.dev');
+    } else {
+        allowedOrigins = allowedOrigins.concat('http://localhost:3001');
+    }
 
-app.use(cors(corsOptions));
+    const { origin } = req.headers;
+    if (allowedOrigins.indexOf(origin) > -1) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.header(
+        'Access-Control-Allow-Methods',
+        'GET, POST, PUT, DELETE, OPTIONS',
+    );
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization,sentry-trace');
+    res.header('Access-Control-Allow-Credentials', true);
+    if (req.method === 'OPTIONS') return res.sendStatus(200);
 
+    return next();
+});
 // Logging incoming request on console on development and sourcing out on production
 app.use(
     responseTime((req, res, time) => {
