@@ -20,7 +20,7 @@ const limiter = rateLimit({
 
 // initating express app
 const app = express();
-// app.use(cors());
+app.use(cors());
 
 // importing routes
 const login = require('./routes/Login');
