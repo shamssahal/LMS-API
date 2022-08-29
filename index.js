@@ -20,7 +20,7 @@ const limiter = rateLimit({
 
 // initating express app
 const app = express();
-app.use(cors());
+// app.use(cors());
 
 // importing routes
 const login = require('./routes/Login');
@@ -32,10 +32,12 @@ app.use((req, res, next) => {
     let allowedOrigins = [
         'http://localhost:3001',
         'https://lms-app-chi.vercel.app',
+        'https://lms.sahal.dev/',
     ];
 
     if (process.env.NODE_ENV === 'production') {
         allowedOrigins = allowedOrigins.concat('https://lms-app-chi.vercel.app');
+        allowedOrigins = allowedOrigins.concat('https://lms.sahal.dev/');
     } else {
         allowedOrigins = allowedOrigins.concat('http://localhost:3001');
     }
